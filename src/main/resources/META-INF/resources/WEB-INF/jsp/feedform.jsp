@@ -14,15 +14,18 @@
         <form:form action="/feed" method="post" modelAttribute="feed">
         <table>
             <form:hidden path="id"/>
-		
-			<form:hidden path="feedName"/>
+			<form:hidden path="title"/>
+			 <tr>
+                <td>lastUpdate:</td>
+                <td><form:input path="lastUpdate" /></td>
+            </tr>
             <tr>
                 <td>Url:</td>
                 <td><form:input path="url" /></td>
             </tr>
             <tr>
                 <td>Title:</td>
-                <td><form:input path="title" /></td>
+                <td><form:input path="feedName" /></td>
             </tr>
             <tr>
                 <td colspan="2" align="center"><input type="submit" value="Save"></td>

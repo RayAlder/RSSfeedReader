@@ -1,5 +1,8 @@
 package com.feedApp.feed;
 
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.io.SyndFeedInput;
+import com.rometools.rome.io.XmlReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -47,7 +50,7 @@ public class FeedController {
 
     @RequestMapping(value = "feed", method = RequestMethod.POST)
     public String saveFeed(Feed feed){
-        feed.setLastUpdate(new Date());
+        feedService.fetchFeedItems(feed);
         feedService.saveFeed(feed);
         return "redirect:/feed/" + feed.getId();
     }

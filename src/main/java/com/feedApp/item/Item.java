@@ -1,8 +1,6 @@
 package com.feedApp.item;
 
-
 import com.feedApp.feed.Feed;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -20,7 +18,7 @@ public class Item implements Serializable {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name="feed_id", nullable=false)
+    @JoinColumn(name="feed_id", insertable=false, updatable=false, nullable=false)
     private Feed sourceFeed;
 
     @Column
@@ -37,6 +35,12 @@ public class Item implements Serializable {
     private Date published;
 
     public Item() {
+    }
+
+    public Item(String title, String link, Date published) {
+        this.title=title;
+        this.link=link;
+        this.published=published;
     }
 
     public Integer getId() {
