@@ -1,37 +1,54 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-    "http://www.w3.org/TR/html4/loose.dtd">
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>New/Edit Feed</title>
+<title>Feed properties</title>
 </head>
+
+<jsp:include page="fragments/header.jsp" />
+
 <body>
     <div align="center">
-        <h1>New/Edit Feed</h1>
-        <form:form action="/feed" method="post" modelAttribute="feed">
-        <table>
-            <form:hidden path="id"/>
-			<form:hidden path="title"/>
-			 <tr>
-                <td>lastUpdate:</td>
-                <td><form:input path="lastUpdate" /></td>
-            </tr>
-            <tr>
-                <td>Url:</td>
-                <td><form:input path="url" /></td>
-            </tr>
-            <tr>
-                <td>Title:</td>
-                <td><form:input path="feedName" /></td>
-            </tr>
-            <tr>
-                <td colspan="2" align="center"><input type="submit" value="Save"></td>
-            </tr>
-        </table>
-        </form:form>
+		<c:choose>
+			<c:when test="${feed.id gt 0}">
+				<h1>Edit Feed</h1>
+			</c:when>    
+			<c:otherwise>
+				<h1>Add Feed</h1>
+			</c:otherwise>
+		</c:choose>
+		<table>
+			<form:form action="/feed" method="post" commandName="feed" modelAttribute="feed">
+				<form:hidden path="id"/>
+				<form:hidden path="title"/>
+				<form:hidden path="items"/>
+				<form:hidden path="lastUpdate"/>
+				<spring:bind path="url">
+					<tr>  
+						<td>Url: </td> <td><form:input  path="url"/> </td><td><form:errors path="url" /></td>
+					</tr>
+				</spring:bind>					
+				<spring:bind path="feedName">
+					<tr> 
+						<td>Feed name: </td> <td><form:input path="feedName"/> </td><td><form:errors path="feedName" /></td>
+					</tr>  
+				</spring:bind>
+				<tr> 
+					<td colspan=2> <input type="submit"> </td> 
+				</tr>
+			</form:form>
+		</table>
+		<!--
+		<spring:hasBindErrors name="feed">
+			<c:forEach var="error" items="${errors.allErrors}">
+				<b><spring:message message="${error}" /></b>
+				<br />
+			</c:forEach>
+		</spring:hasBindErrors>
+		-->
     </div>
 </body>
 </html>

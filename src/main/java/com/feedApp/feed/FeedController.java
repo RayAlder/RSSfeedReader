@@ -1,14 +1,17 @@
 package com.feedApp.feed;
 
-import com.rometools.rome.feed.synd.SyndFeed;
-import com.rometools.rome.io.SyndFeedInput;
-import com.rometools.rome.io.XmlReader;
+import com.feedApp.Validator.FeedFormValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -22,6 +25,17 @@ public class FeedController {
     @Autowired
     public void setFeedService(FeedService feedService) {
         this.feedService = feedService;
+    }
+
+    @Autowired
+    FeedFormValidator feedFormValidator;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.setValidator(feedFormValidator);
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+        sdf.setLenient(false);
+        binder.registerCustomEditor(Date.class, "lastUpdate", new CustomDateEditor(sdf, true));
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
@@ -49,10 +63,18 @@ public class FeedController {
     }
 
     @RequestMapping(value = "feed", method = RequestMethod.POST)
-    public String saveFeed(Feed feed){
-        feedService.fetchFeedItems(feed);
-        feedService.saveFeed(feed);
-        return "redirect:/feed/" + feed.getId();
+    public String saveFeed(@ModelAttribute("feed") @Validated Feed feed, BindingResult result, Model model){
+        if (result.hasErrors()) {
+            return "feedform";
+        } else {
+            if(!feedService.fetchFeedItems(feed)){
+                result.rejectValue("url","error.feed", "Could not connect to the specified url");
+                return "feedform";
+            } else {
+                feedService.saveFeed(feed);
+                return "redirect:/feed/" + feed.getId();
+            }
+        }
     }
 
     @RequestMapping("feed/delete/{id}")

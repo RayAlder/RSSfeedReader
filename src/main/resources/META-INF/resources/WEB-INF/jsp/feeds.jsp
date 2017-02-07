@@ -1,5 +1,8 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <html>
+
+<jsp:include page="fragments/header.jsp" />
+
 <body>
 	<h2>Feeds list</h2>
 

@@ -9,8 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,18 +41,16 @@ public class FeedService {
         feedRepository.delete(id);
     }
 
-    public void fetchFeedItems(Feed feed) {
+    public boolean fetchFeedItems(Feed feed) {
         String url = feed.getUrl();
         try {
             SyndFeed syndFeed = new SyndFeedInput().build(new XmlReader(new URL(url)));
             if (!syndFeed.getPublishedDate().equals(feed.getLastUpdate())) {
-                System.out.println("Synd Feed: "+syndFeed.getPublishedDate());
-                System.out.println("Feed: "+feed.getLastUpdate());
                 feed.setLastUpdate(syndFeed.getPublishedDate());
                 feed.setTitle(syndFeed.getTitle());
 
                 List<SyndEntry> syndEntries = syndFeed.getEntries();
-                feed.setItems(new HashSet<Item>());
+                feed.setItems(new ArrayList<Item>());
                 for (SyndEntry syndEntry : syndEntries) {
                     feed.getItems().add(new Item(syndEntry.getTitle(), syndEntry.getLink(), syndEntry.getPublishedDate()));
                 }
@@ -61,7 +58,9 @@ public class FeedService {
         }
         catch (Exception ex) {
             ex.printStackTrace();
-            System.out.println("Exception while making HTTP request: "+ex.getMessage());
+            System.out.println("Exception while connecting to: "+ex.getMessage());
+            return false;
         }
+        return true;
     }
 }

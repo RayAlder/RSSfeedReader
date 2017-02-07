@@ -4,9 +4,9 @@ package com.feedApp.feed;
  * Created by Ray on 04/02/2017.
  */
 import com.feedApp.item.Item;
-
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.*;
 
@@ -24,15 +24,16 @@ public class Feed implements Serializable {
     @Column
     private String title;
 
-    @Column(name = "last_update", columnDefinition="DATETIME")
-    private java.util.Date lastUpdate;
+    @Column(name = "last_update")
+    private Date lastUpdate;
 
     @Column(name = "feed_name")
     private String feedName;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true, fetch = FetchType.LAZY)
     @JoinColumn(name="feed_id")
-    private Set<Item> items;
+    @OrderBy("published DESC")
+    private List<Item> items;
 
     public Feed() {
     }
@@ -61,7 +62,7 @@ public class Feed implements Serializable {
         this.title = title;
     }
 
-    public java.util.Date getLastUpdate() {
+    public Date getLastUpdate() {
         return lastUpdate;
     }
 
@@ -77,11 +78,11 @@ public class Feed implements Serializable {
         this.feedName = feedName;
     }
 
-    public Set<Item> getItems() {
+    public List<Item> getItems() {
         return items;
     }
 
-    public void setItems(Set<Item> items) {
+    public void setItems(List<Item> items) {
         this.items = items;
     }
 }

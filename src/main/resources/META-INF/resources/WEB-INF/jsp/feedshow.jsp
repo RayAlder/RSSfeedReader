@@ -1,5 +1,9 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <html>
+
+<jsp:include page="fragments/header.jsp" />
+
 <body>
 	<h2>Feed</h2> <a href="/">Back</a>
 
@@ -56,6 +60,14 @@
 			</c:forEach>			
 		</table>
 	</c:if>
-	<a classs="btn" href="/item/new">Add new</a>
+	<form:form action="/feed" method="post" commandName="feed" modelAttribute="feed">
+		<form:hidden path="id"/>
+		<form:hidden path="title"/>
+		<form:hidden path="items"/>
+		<form:hidden path="lastUpdate"/>
+		<form:hidden path="url"/>
+		<form:hidden path="feedName"/>
+		<input type="submit" name="action" value="Refresh feed"/>
+	</form:form>	
 </body>
 </html>
