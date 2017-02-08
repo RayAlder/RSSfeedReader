@@ -1,6 +1,5 @@
 package com.feedApp.feed;
 
-import com.feedApp.Validator.FeedFormValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -45,25 +44,33 @@ public class FeedController {
     }
 
     @RequestMapping("feed/{id}")
-    public String showFeed(@PathVariable Integer id, Model model){
-        model.addAttribute("feed", feedService.getFeedById(id));
-        return "feedshow";
+    public String showFeed(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes){
+        Feed feed=feedService.getFeedById(id);
+        if(feed==null) {
+            redirectAttributes.addFlashAttribute("css", "danger");
+            redirectAttributes.addFlashAttribute("msg", "Feed "+id+" does not exist");
+            return "redirect:/";
+        } else{
+            model.addAttribute("feed", feed);
+            return "feedshow";
+        }
     }
 
     @RequestMapping("feed/edit/{id}")
     public String edit(@PathVariable Integer id, Model model){
-        model.addAttribute("feed", feedService.getFeedById(id));
+        model.addAttribute("feedForm", feedService.getFeedById(id));
         return "feedform";
     }
 
     @RequestMapping("feed/new")
     public String newFeed(Model model){
-        model.addAttribute("feed", new Feed());
+        model.addAttribute("feedForm", new Feed());
         return "feedform";
     }
 
     @RequestMapping(value = "feed", method = RequestMethod.POST)
-    public String saveFeed(@ModelAttribute("feed") @Validated Feed feed, BindingResult result, Model model){
+    public String saveFeed(@ModelAttribute("feedForm") @Validated Feed feed, BindingResult result, Model model,
+    final RedirectAttributes redirectAttributes){
         if (result.hasErrors()) {
             return "feedform";
         } else {
@@ -72,15 +79,46 @@ public class FeedController {
                 return "feedform";
             } else {
                 feedService.saveFeed(feed);
+                redirectAttributes.addFlashAttribute("css", "success");
+                redirectAttributes.addFlashAttribute("msg", "Feed information saved!");
                 return "redirect:/feed/" + feed.getId();
             }
         }
     }
 
     @RequestMapping("feed/delete/{id}")
-    public String delete(@PathVariable Integer id){
+    public String delete(@PathVariable Integer id, final RedirectAttributes redirectAttributes){
+        if(feedService.getFeedById(id)==null) {
+            redirectAttributes.addFlashAttribute("css", "danger");
+            redirectAttributes.addFlashAttribute("msg", "Feed "+id+" does not exist");
+            return "redirect:/";
+        }
         feedService.deleteFeed(id);
+
+        redirectAttributes.addFlashAttribute("css", "success");
+        redirectAttributes.addFlashAttribute("msg", "Feed has been deleted!");
+
         return "redirect:/";
+    }
+
+    @RequestMapping("feed/fetchItems/{id}")
+    public String fetchItems(@PathVariable Integer id, final RedirectAttributes redirectAttributes){
+        Feed feed=feedService.getFeedById(id);
+        if (feed==null){
+            redirectAttributes.addFlashAttribute("css", "danger");
+            redirectAttributes.addFlashAttribute("msg", "Feed "+id+" does not exist");
+            return "redirect:/";
+        } else {
+            if (!feedService.fetchFeedItems(feed)) {
+                redirectAttributes.addFlashAttribute("css", "danger");
+                redirectAttributes.addFlashAttribute("msg", "Could fetch data from: " + feed.getUrl());
+            } else {
+                redirectAttributes.addFlashAttribute("css", "success");
+                redirectAttributes.addFlashAttribute("msg", "Feed contents synchronized!");
+                feedService.saveFeed(feed);
+            }
+        }
+        return "redirect:/feed/{id}";
     }
 
 }

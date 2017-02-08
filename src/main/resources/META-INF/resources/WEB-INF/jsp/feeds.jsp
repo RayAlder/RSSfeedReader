@@ -1,42 +1,46 @@
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ page session="false"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+
+<!DOCTYPE html>
 <html>
-
 <jsp:include page="fragments/header.jsp" />
-
 <body>
-	<h2>Feeds list</h2>
-
-	<c:if test="${not empty feeds}">
-
-		<table>
-			<tr>
-				<th>Id</th>
-				<th>Url</th>
-				<th>Title </th>
-				<th>Last update</th>
-				<th>Feed name</th>
-				<th>Actions</th>
-			</tr>
-			<c:forEach var="feed" items="${feeds}">
-			<tr>
-				<td>${feed.id}</td>
-				<td>${feed.url}</td>
-				<td>${feed.title}</td>
-				<td>${feed.lastUpdate}</td>
-				<td>${feed.feedName}</td>
-				<td>
-					<a href="/feed/${feed.id}">View</a>
-					&nbsp;&nbsp;
-					<a href="/feed/edit/${feed.id}">Edit</a>
-                        &nbsp;&nbsp;
-                     <a href="/feed/delete/${feed.id}">Delete</a>
-				</td>
-			</tr>	
-			</c:forEach>
-		</table>
-
-		
-		<a classs="btn" href="/feed/new">Add new</a>
-	</c:if>
+	<div class="container">
+		<c:if test="${not empty msg}">
+			<div class="alert alert-${css} alert-dismissible" role="alert">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<strong>${msg}</strong>
+			</div>
+		</c:if>
+		<div class="row col-md-offset-4">
+			<h2>XML RSS Feeds</h1>
+			<br>
+			<c:choose>
+				<c:when test="${not empty feeds}">
+					<h4>Please find the list of all available feeds</h4>
+				</c:when>    
+				<c:otherwise>
+					<h4>Currently there are no saved feeds</h4>
+				</c:otherwise>
+			</c:choose>
+			<div class="list-group col-md-6">
+				<c:forEach var="feed" items="${feeds}">
+					<a href="/feed/${feed.id}" class="list-group-item">
+						${feed.feedName} <span class="badge">${fn:length(feed.items)}</span>
+					</a>
+				</c:forEach>
+			</div>
+		</div>
+		<div class="row col-md-offset-4">
+			<button class="btn btn-primary" onclick="location.href='/feed/new'">Add feed</button>
+		</div>
+	</div>
+	
+<jsp:include page="fragments/footer.jsp" />
 </body>
 </html>

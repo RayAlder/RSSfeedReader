@@ -1,4 +1,4 @@
-package com.feedApp.Validator;
+package com.feedApp.feed;
 
 import com.feedApp.feed.Feed;
 import com.feedApp.feed.FeedService;
@@ -8,7 +8,6 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
-//http://docs.spring.io/spring/docs/current/spring-framework-reference/html/validation.html#validation-mvc-configuring
 @Component
 public class FeedFormValidator implements Validator {
 
@@ -25,11 +24,11 @@ public class FeedFormValidator implements Validator {
 
         Feed feed = (Feed) target;
 
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "url", "NotEmpty.feed.url");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "feedName", "NotEmpty.feed.feedName");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "url", "NotEmpty.feedForm.url");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "feedName", "NotEmpty.feedForm.feedName");
 
         if(!(feed.getUrl().contains("http://")||feed.getUrl().contains("https://"))){
-            errors.rejectValue("url", "NoProtocol.feed.url");
+            errors.rejectValue("url", "NoProtocol.feedForm.url");
         }
 
     }

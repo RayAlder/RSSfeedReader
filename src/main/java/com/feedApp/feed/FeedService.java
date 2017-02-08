@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Created by Ray on 04/02/2017.
@@ -48,9 +49,11 @@ public class FeedService {
             if (!syndFeed.getPublishedDate().equals(feed.getLastUpdate())) {
                 feed.setLastUpdate(syndFeed.getPublishedDate());
                 feed.setTitle(syndFeed.getTitle());
-
                 List<SyndEntry> syndEntries = syndFeed.getEntries();
-                feed.setItems(new ArrayList<Item>());
+                for (Item feedItem :  feed.getItems()) {
+                    Predicate<SyndEntry> itemPredicate = p-> p.getPublishedDate().equals(feedItem.getPublished());
+                    syndEntries.removeIf(itemPredicate);
+                }
                 for (SyndEntry syndEntry : syndEntries) {
                     feed.getItems().add(new Item(syndEntry.getTitle(), syndEntry.getLink(), syndEntry.getPublishedDate()));
                 }
